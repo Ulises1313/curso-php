@@ -1,5 +1,9 @@
 <?php
+#Esto habilitara el tipado estricto
+declare(strict_types=1);
 const API_URL = "https://whenisthenextmcufilm.com/api";
+/*
+#Esta manera es la manera más cruda  de hacer una peticion 
 #Inicializar una nueva sesion de cURL; ch = cURL handle
 $ch = curl_init(API_URL); 
 //Indicar que queremos recibir el resultado de la peticion y no mostrarla en pantalla
@@ -7,11 +11,23 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
 /* Ejecutar la peticion
     y guardamos el resultado
-*/
+
 $result = curl_exec($ch);
 $data = json_decode($result, true);
 curl_close($ch);
+*/
 
+#Creación de funciones en php
+function get_data(string $url) : array {
+    #En caso donde solo quieras hacer una peticion GET
+    #Puedes usar
+    $result = file_get_contents($url); 
+    #Decodificamos el json
+    $data = json_decode($result,true);
+    return $data;
+}
+
+$data = get_data(API_URL);
 
 ?>
 
@@ -21,9 +37,6 @@ curl_close($ch);
 </head>
 
 <main>
-    <pre style="font-size: 20px; overflow: scroll; height: 250px;">
-        <?php var_dump($data); ?>
-    </pre>
     <section>
         <img src="<?=$data["poster_url"]; ?>" alt="Poster de <?= $data["title"]; ?>" width="200" style="border-radius: 16px;">
     </section>
