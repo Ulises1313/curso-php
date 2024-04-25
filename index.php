@@ -1,77 +1,25 @@
 <?php
-#Esto habilitara el tipado estricto
-declare(strict_types=1);
-const API_URL = "https://whenisthenextmcufilm.com/api";
-/*
-#Esta manera es la manera más cruda  de hacer una peticion 
-#Inicializar una nueva sesion de cURL; ch = cURL handle
-$ch = curl_init(API_URL); 
-//Indicar que queremos recibir el resultado de la peticion y no mostrarla en pantalla
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-/* Ejecutar la peticion
-    y guardamos el resultado
-
-$result = curl_exec($ch);
-$data = json_decode($result, true);
-curl_close($ch);
-*/
-
-#Creación de funciones en php
-function get_data(string $url) : array {
-    #En caso donde solo quieras hacer una peticion GET
-    #Puedes usar
-    $result = file_get_contents($url); 
-    #Decodificamos el json
-    $data = json_decode($result,true);
-    return $data;
-}
-
+#require 'functions.php';  # <- Esto trae el codigo del archivo y lo pega en donde se importo
+require_once 'const.php';
+require_once 'functions.php'; # <- Este es para asegurarse que se importe una sola vez y no se duplice
+#Si se pone un archivo que no existe se rompe el programa
+#Para evitar eso se usa:
+#include 'functions.php';
+#Tener cuidado en usar uno u otro, se recomienda el require porque muestra un precioso FATAL ERROR
 $data = get_data(API_URL);
+$untilMessage = get_until_message($data["days_until"]);
 
 ?>
 
-<head>
-    <title>La proxima pelicula de Marvel</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
-</head>
+<?php
+    #Recuerda que puedes pasar solo la propiedad que necesitas
+    render_template('head', ["title" => $data["title"]]) ?>
+<?php render_template('styles') ?>
 
-<main>
-    <section>
-        <img src="<?=$data["poster_url"]; ?>" alt="Poster de <?= $data["title"]; ?>" width="200" style="border-radius: 16px;">
-    </section>
-    <hgroup>
-        <h3><?= $data["title"];?> se estrena en <?= $data["days_until"]; ?> dias</h3>
-        <p>Fecha de estreno: <?= $data["release_date"]; ?></p>
-        <p>La siguiente es: <?= $data["following_production"]["title"]; ?></p>
-        
-    </hgroup>
-</main>
+<?php
+    #Podemos fusionar arreglos para pasar un valor, es como agregarle un nuevo valor
+    #en php se llama mergear o merge 
+    render_template('main',array_merge($data,["untilMessage" => $untilMessage])) 
+?>
 
-<style>
-    :root {
-        color-scheme: light dark;
-    }
 
-    body {
-        display: grid;
-        place-content: center;
-    }
-
-    section{
-        display: flex;
-        justify-content: center;
-        text-align: center;
-    }
-
-    hgroup{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        text-align: center;
-    }
-
-    img{
-        margin: 0 auto;
-    }
-</style>
